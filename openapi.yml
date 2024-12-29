@@ -65,6 +65,8 @@ paths:
                 description:
                   type: string
                   example: Milk, bread, and eggs
+              required:
+                - title
       responses:
         '200':
           description: Task successfully created

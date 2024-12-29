@@ -1,6 +1,6 @@
 import mongoose, { type ConnectOptions } from 'mongoose';
 
-import { TaskModel } from './models/Task.ts';
+import { TaskModel } from './models';
 
 export class Mongoose {
   private static instance?: Mongoose;
@@ -8,39 +8,51 @@ export class Mongoose {
 
   public static start = async () => {
     if (this.instance) {
-      throw new Error('Mongo instance already started');
+      console.log('\x1b[33m⚠ Mongo instance already started\x1b[0m');
+      return this.instance;
     }
     this.instance = new Mongoose();
     await this.instance.connectToMongoDb();
     await this.instance.syncMongoModels();
-    console.log('\x1b[32m💾 Mongo instance started\x1b[0m');
   };
 
   private syncMongoModels = async () => {
     const models = [TaskModel];
+    if (models.length === 0) {
+      console.log('\x1b[33m%s\x1b[0m', '⚠ No models to sync');
+      return;
+    }
+
     for (const model of models) {
       await model.syncIndexes();
     }
   };
 
-  private connectToMongoDb = async () => {
+  private connectToMongoDb = async (retries = 5, delay = 3000) => {
     const options: ConnectOptions = {
-      dbName: 'tidy-notes',
+      dbName: Mongoose.dbName,
     };
     const MONGO_URI = process.env.MONGO_URI;
     if (!MONGO_URI) {
       throw new Error("MONGO_URI doesn't exist");
     }
 
-    await new Promise<void>((resolve, reject) => {
-      mongoose
-        .connect(MONGO_URI, options)
-        .then(() => resolve())
-        .catch((e: unknown) => {
-          console.log('\x1b[31m%s\x1b[0m', `❌ Mongoose initial connection failed`);
-          reject(e as Error);
-        });
-    });
+    for (let i = 0; i < retries; i++) {
+      try {
+        await mongoose.connect(MONGO_URI, options);
+        console.log('\x1b[32m%s\x1b[0m', '✅ Mongo connected');
+        return;
+      } catch (e) {
+        console.error(e);
+        console.log(
+          '\x1b[33m%s\x1b[0m',
+          `Attempt ${i + 1} failed. Retrying in ${delay / 1000}s...`
+        );
+        await new Promise(res => setTimeout(res, delay));
+      }
+    }
+
+    throw new Error('Failed to connect to MongoDB after multiple attempts');
   };
 
   private stop = async () => {
