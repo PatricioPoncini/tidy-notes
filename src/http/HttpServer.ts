@@ -1,4 +1,7 @@
 import express, {type Express } from "express";
+import taskRoutes from "./routes/tasks.ts";
+import morgan from "morgan";
+import cors from "cors";
 
 export class HttpServer {
     private static instance?: HttpServer;
@@ -14,6 +17,9 @@ export class HttpServer {
     private configureMiddleware() {
         //this.app.use(bodyParser.json());
         //this.app.use(bodyParser.urlencoded({ extended: true }));
+        this.app.use(express.json());
+        this.app.use(morgan("dev"));
+        this.app.use(cors());
     }
 
     private configureRoutes() {
@@ -21,22 +27,7 @@ export class HttpServer {
             res.send("🚀 Server is running!");
         });
 
-        this.app.use("/tasks", this.taskRoutes());
-    }
-
-    private taskRoutes() {
-        const router = express.Router();
-
-        router.get("/", (req, res) => {
-            res.send("📋 List of tasks");
-        });
-
-        router.post("/", (req, res) => {
-            const { title, description } = req.body;
-            res.status(201).send({ message: "Task created", title, description });
-        });
-
-        return router;
+        this.app.use("/tasks", taskRoutes);
     }
 
     public static start(port: number) {

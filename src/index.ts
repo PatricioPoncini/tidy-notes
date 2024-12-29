@@ -12,7 +12,7 @@ const startApp = async () => {
         console.log("✅ Mongoose connected successfully!");
 
         console.log("⏳ Starting HTTP server...");
-        HttpServer.start(3000);
+        HttpServer.start(4000);
         console.log("✅ HTTP server is running on port 3000!");
         console.log("📝 Application is ready to accept requests.");
     } catch (error) {
