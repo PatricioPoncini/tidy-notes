@@ -1,41 +1,34 @@
-import { Mongoose } from "./db";
-import { HttpServer } from "./http";
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
+
+import { Mongoose } from './db';
+import { HttpServer } from './http';
 
 const startApp = async () => {
-    dotenv.config();
+  dotenv.config();
+  try {
+    console.log('\x1b[32m🚀 Starting application...\x1b[0m');
+
+    await Mongoose.start();
+    HttpServer.start(4000);
+  } catch (error) {
+    console.error('❌ Failed to start application:', error);
+    process.exit(1);
+  }
+
+  process.on('SIGINT', async () => {
+    console.log('\x1b[38;5;214m🔄 Gracefully shutting down...\x1b[0m');
     try {
-        console.log("🚀 Starting application...");
+      await Mongoose.stop();
+      console.log('\x1b[38;5;214m✅ MongoDB disconnected successfully.\x1b[0m');
 
-        console.log("⏳ Connecting to MongoDB...");
-        await Mongoose.start();
-        console.log("✅ Mongoose connected successfully!");
-
-        console.log("⏳ Starting HTTP server...");
-        HttpServer.start(3000);
-        console.log("✅ HTTP server is running on port 3000!");
-        console.log("📝 Application is ready to accept requests.");
-    } catch (error) {
-        console.error("❌ Failed to start application:", error);
-        process.exit(1);
+      HttpServer.stop();
+      console.log('\x1b[38;5;214m✅ HTTP server stopped gracefully.\x1b[0m');
+    } catch (shutdownError) {
+      console.error('❌ Error during shutdown:', shutdownError);
+    } finally {
+      process.exit(0);
     }
-
-    process.on("SIGINT", async () => {
-        console.log("🔄 Gracefully shutting down...");
-        try {
-            console.log("⏳ Disconnecting MongoDB...");
-            await Mongoose.stop();
-            console.log("✅ MongoDB disconnected successfully.");
-
-            console.log("⏳ Stopping HTTP server...");
-            HttpServer.stop();
-            console.log("✅ HTTP server stopped gracefully.");
-        } catch (shutdownError) {
-            console.error("❌ Error during shutdown:", shutdownError);
-        } finally {
-            process.exit(0);
-        }
-    });
+  });
 };
 
 await startApp();
