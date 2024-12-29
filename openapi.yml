@@ -1,0 +1,162 @@
+openapi: 3.0.0
+info:
+  title: Task API
+  description: API to manage tasks
+  version: 1.0.0
+servers:
+  - url: http://localhost:3000/api
+    description: Local server
+
+paths:
+  /tasks:
+    get:
+      summary: Retrieve all tasks
+      description: Get a list of tasks. Optionally filter by completion status.
+      parameters:
+        - name: completed
+          in: query
+          required: false
+          description: Filter tasks by completion status. Accepts 'true' or 'false'.
+          schema:
+            type: string
+            enum: [true, false]
+      responses:
+        '200':
+          description: List of tasks successfully retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                      example: 60d21b4667d0d8992e610c85
+                    title:
+                      type: string
+                      example: Buy groceries
+                    description:
+                      type: string
+                      example: Milk, bread, and eggs
+                    completed:
+                      type: boolean
+                      example: false
+        '404':
+          description: No tasks found
+        '400':
+          description: Invalid query parameter
+        '500':
+          description: Internal server error
+
+    post:
+      summary: Create a new task
+      description: Create a task with a title and optional description.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Buy groceries
+                description:
+                  type: string
+                  example: Milk, bread, and eggs
+      responses:
+        '200':
+          description: Task successfully created
+        '400':
+          description: Validation error
+        '500':
+          description: Internal server error
+
+  /tasks/{id}:
+    get:
+      summary: Retrieve a task by ID
+      description: Get the details of a specific task by providing its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the task to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  title:
+                    type: string
+                  description:
+                    type: string
+                  completed:
+                    type: boolean
+        '404':
+          description: Task not found
+        '400':
+          description: Invalid task ID
+
+    put:
+      summary: Update a task by ID
+      description: Update the details of an existing task by providing its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the task to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: Buy groceries
+                description:
+                  type: string
+                  example: Updated description
+                completed:
+                  type: boolean
+                  example: true
+      responses:
+        '200':
+          description: Task successfully updated
+        '404':
+          description: Task not found
+        '400':
+          description: Invalid task ID or request body
+        '500':
+          description: Internal server error
+
+    delete:
+      summary: Delete a task by ID
+      description: Delete a specific task by providing its ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the task to delete
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Task successfully deleted
+        '404':
+          description: Task not found
+        '400':
+          description: Invalid task ID
+        '500':
+          description: Internal server error
