@@ -1,18 +1,37 @@
-# tidy-notes-back
+# Tidy Notes - Backend
+**Backend de Tidy Notes** – Aplicación de gestión de notas con MongoDB y TypeScript.
 
-## Pasos para clonar el repositorio
+## 🚀 Tecnologías utilizadas
+[![My Skills](https://skillicons.dev/icons?i=ts,docker,mongo,bash,bun)](https://skillicons.dev)
 
-1. Clonar el repositorio utilizando el comando `git clone https://github.com/PatricioPoncini/tidy-notes.git`
-2. Entrar al repositorio con `cd tidy-notes`
-3. Instalar dependencias con Bun utilizando `bun i`
-4. Levantar la base de datos Mongo con docker compose `docker compose up -d`. Esto levantará un container con Mongo sin necesidad de instalarlo.
-5. Crear un archivo `.env` como el que hay de ejemplo debajo
-6. Levantar el backend utilzando el comando `bun run dev`
+---  
 
-## .env
+## 📥 Pasos para clonar y ejecutar el proyecto
 
-```dotenv
+### 1. Clonar el repositorio
+```bash
+git clone https://github.com/PatricioPoncini/tidy-notes.git
+cd tidy-notes
+```
+### 2. Instalar dependencias
+```bash
+bun i
+```
+
+### 3. Levantar MongoDB con Docker
+```bash
+docker compose up -d
+```
+
+### 4. Configuración del entorno
+Crear un archivo `.env` y pegar las siguientes credenciales
+```bash
 MONGO_INITDB_ROOT_USERNAME=root
 MONGO_INITDB_ROOT_PASSWORD=secret
 MONGO_URI=mongodb://root:secret@localhost:27017
+```
+
+### 5. Levantar el backend
+```bash
+bun run dev
 ```
